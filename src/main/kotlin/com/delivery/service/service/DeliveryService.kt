@@ -1,9 +1,10 @@
 package com.delivery.service.service
 
-import com.delivery.service.controller.request.DeliverySummaryResponse
+import com.delivery.service.controller.response.DeliverySummaryResponse
 import com.delivery.service.controller.response.DeliveryResponse
 import com.delivery.service.exception.DeliveryNotFoundException
 import com.delivery.service.exception.DeliveryStatusNotValidException
+import com.delivery.service.exception.ErrorMessages
 import com.delivery.service.exception.InvalidDeliveryTimeException
 import com.delivery.service.model.DeliveryStatus
 import com.delivery.service.model.entity.Delivery
@@ -96,14 +97,14 @@ class DeliveryService(
     ) {
         if (finishedAt != null) {
             if (finishedAt.isBefore(startedAt)) {
-                throw InvalidDeliveryTimeException("Finished Date cannot be before Started Date")
+                throw InvalidDeliveryTimeException(ErrorMessages.FINISHED_DATE_BEFORE_STARTED_DATE)
             }
             if (status != DeliveryStatus.DELIVERED) {
-                throw DeliveryStatusNotValidException("If Finished Date is set, status must be DELIVERED")
+                throw DeliveryStatusNotValidException(ErrorMessages.STATUS_MUST_BE_DELIVERED_WITH_FINISHED_DATE)
             }
         } else {
             if (status == DeliveryStatus.DELIVERED) {
-                throw InvalidDeliveryTimeException("Finished Date must be set when status is DELIVERED")
+                throw InvalidDeliveryTimeException(ErrorMessages.FINISHED_DATE_REQUIRED_FOR_DELIVERED_STATUS)
             }
         }
     }
@@ -111,6 +112,6 @@ class DeliveryService(
 
     fun findById(deliveryId: String): Delivery {
         return deliveryRepository.findById(deliveryId)
-            .orElseThrow { throw DeliveryNotFoundException("Delivery with id $deliveryId not found") }
+            .orElseThrow { throw DeliveryNotFoundException(String.format(ErrorMessages.DELIVERY_NOT_FOUND, deliveryId)) }
     }
 }

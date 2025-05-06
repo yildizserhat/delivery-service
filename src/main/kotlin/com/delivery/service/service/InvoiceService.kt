@@ -5,6 +5,7 @@ import com.delivery.service.controller.request.InvoiceRequest
 import com.delivery.service.controller.response.DeliveryInvoiceResponse
 import com.delivery.service.controller.response.InvoiceResponse
 import com.delivery.service.exception.DeliveryStatusNotValidException
+import com.delivery.service.exception.ErrorMessages
 import com.delivery.service.model.DeliveryStatus
 import com.delivery.service.model.entity.Delivery
 import com.delivery.service.model.entity.Invoice
@@ -32,8 +33,8 @@ class InvoiceService(
                 saveInvoice(invoiceId, deliveryId)
                 DeliveryInvoiceResponse(deliveryId = delivery.id, invoiceId = invoiceId)
             } catch (ex: IllegalArgumentException) {
-                logger.error { "Delivery Id not valid $deliveryId" }
-                throw IllegalArgumentException("Delivery Id not valid $deliveryId")
+                logger.error { String.format(ErrorMessages.DELIVERY_ID_NOT_VALID, deliveryId) }
+                throw IllegalArgumentException(String.format(ErrorMessages.DELIVERY_ID_NOT_VALID, deliveryId))
             }
         }
         return responses
@@ -41,8 +42,8 @@ class InvoiceService(
 
     private fun validateDeliveryStatus(delivery: Delivery, deliveryId: String) {
         if (delivery.status != DeliveryStatus.DELIVERED) {
-            logger.error { "Delivery must be in DELIVERED status to send invoice : ${deliveryId}" }
-            throw DeliveryStatusNotValidException("Delivery must be in DELIVERED status to send invoice")
+            logger.error { "${ErrorMessages.DELIVERY_MUST_BE_DELIVERED_FOR_INVOICE} : ${deliveryId}" }
+            throw DeliveryStatusNotValidException(ErrorMessages.DELIVERY_MUST_BE_DELIVERED_FOR_INVOICE)
         }
     }
 

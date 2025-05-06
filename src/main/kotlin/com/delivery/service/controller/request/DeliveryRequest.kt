@@ -1,24 +1,25 @@
 package com.delivery.service.controller.request
 
+import com.delivery.service.exception.ErrorMessages
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import java.time.OffsetDateTime
 
 class DeliveryRequest(
-    @field:NotBlank(message = "Vehicle ID must not be blank")
+    @field:NotBlank(message = ErrorMessages.VEHICLE_ID_REQUIRED)
     val vehicleId: String,
 
-    @field:NotBlank(message = "Address must not be blank")
+    @field:NotBlank(message = ErrorMessages.ADDRESS_REQUIRED)
     val address: String,
 
-    @field:NotNull(message = "StartedAt must not be null")
+    @field:NotNull(message = ErrorMessages.STARTED_AT_REQUIRED)
     val startedAt: OffsetDateTime,
 
-    @field:NotNull(message = "Status must not be null")
+    @field:NotNull(message = ErrorMessages.STATUS_REQUIRED)
     @field:Pattern(
         regexp = "IN_PROGRESS|DELIVERED",
-        message = "Status must be either IN_PROGRESS or DELIVERED"
+        message = ErrorMessages.STATUS_INVALID
     )
     val status: String,
 

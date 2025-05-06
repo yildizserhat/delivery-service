@@ -2,7 +2,7 @@ package com.delivery.service.controller
 
 import com.delivery.service.controller.request.DeliveryInvoiceRequest
 import com.delivery.service.controller.request.DeliveryRequest
-import com.delivery.service.controller.request.DeliverySummaryResponse
+import com.delivery.service.controller.response.DeliverySummaryResponse
 import com.delivery.service.controller.response.DeliveryInvoiceResponse
 import com.delivery.service.controller.response.DeliveryResponse
 import com.delivery.service.service.DeliveryService
@@ -54,4 +54,3 @@ class DeliveryController(
         return ResponseEntity.ok(deliveryService.getYesterdayBusinessSummary())
     }
 }
-

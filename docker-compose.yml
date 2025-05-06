@@ -1,0 +1,36 @@
+version: '3.5'
+
+services:
+  mock-api:
+    image: "wiremock/wiremock:3.5.2"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./wiremock/mappings:/home/wiremock/mappings
+    entrypoint: ["/docker-entrypoint.sh", "--port=8000"]
+  application:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mock-api
+      - db
+  db:
+    image: postgres:17
+    command: postgres -c 'max_connections=120'
+    restart: always
+    environment:
+      POSTGRES_USER: delivery
+      POSTGRES_PASSWORD: delivery
+      POSTGRES_DB: delivery-db
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "delivery-db" ]
+      interval: 30s
+      timeout: 60s
+      retries: 5

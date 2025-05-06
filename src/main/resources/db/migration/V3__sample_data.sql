@@ -1,0 +1,6 @@
+INSERT INTO ecommerce.delivery (id, address, finished_at, started_at, status, vehicle_id, invoice_id) VALUES ('cd183d18-e552-45d1-915a-2e046da7889f', 'Example street 15A', '2026-10-09 15:00:00.000000 +00:00', '2025-02-14 12:45:34.678000 +00:00', 'DELIVERED', 'AHV-589', null);
+INSERT INTO ecommerce.delivery (id, address, finished_at, started_at, status, vehicle_id, invoice_id) VALUES ('0df4fedf-f32b-4b45-a27f-e5076421c1a9', 'Example street 16A', null, '2025-02-14 15:45:34.678000 +00:00', 'IN_PROGRESS', 'AHV-589', null);
+INSERT INTO ecommerce.delivery (id, address, finished_at, started_at, status, vehicle_id, invoice_id) VALUES ('8f063bbc-d0e2-434b-9fd3-8ca1601aa26a', 'Example street 17A', '2026-10-09 15:00:00.000000 +00:00', '2025-02-14 12:45:34.678000 +00:00', 'DELIVERED', 'AHV-590', null);
+INSERT INTO ecommerce.delivery (id, address, finished_at, started_at, status, vehicle_id, invoice_id) VALUES ('954e7a48-a543-40c1-a46d-5da117804398', 'Example street 18A', '2026-10-09 15:00:00.000000 +00:00', '2025-02-14 16:45:34.678000 +00:00', 'DELIVERED', 'AHV-591', null);
+INSERT INTO ecommerce.delivery (id, address, finished_at, started_at, status, vehicle_id, invoice_id) VALUES ('4c6bacd9-2dbe-4569-b82e-3638545ceb2e', 'Example street 19A', '2026-02-13 16:50:00.000000 +00:00', '2025-02-14 16:45:34.678000 +00:00', 'DELIVERED', 'AHV-592', null);
+

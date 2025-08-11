@@ -46,41 +46,13 @@ class DeliveryService(
     }
 
     fun getYesterdayBusinessSummary(): DeliverySummaryResponse {
-        // Assume it's Amsterdam time zone
-        val zoneId = ZoneId.of("Europe/Amsterdam")
-
-        val now = ZonedDateTime.now(zoneId)
-        val yesterdayStart = now.minusDays(1).toLocalDate().atStartOfDay(zoneId)
-        val yesterdayEnd = yesterdayStart.plusDays(1)
-
-        // Fetch deliveries that started yesterday
-        val deliveries = deliveryRepository.findAllByStartedAtBetween(
-            yesterdayStart.toOffsetDateTime(),
-            yesterdayEnd.toOffsetDateTime()
-        )
-
+        val (yesterdayStart, yesterdayEnd) = yesterdayRange()
+        val deliveries = deliveryRepository.findAllByStartedAtBetween(yesterdayStart, yesterdayEnd)
         val deliveryCount = deliveries.size
 
         logger.debug { "Found $deliveryCount deliveries that started yesterday" }
-        // If there are fewer than 2 deliveries, average time is 0
-        if (deliveryCount < 2) {
-            return DeliverySummaryResponse(
-                deliveries = deliveryCount,
-                averageMinutesBetweenDeliveryStart = 0.0
-            )
-        }
-        // Sort deliveries by start time
-        val sortedDeliveries = deliveries.sortedBy { it.startedAt }
 
-        // Calculate time differences between consecutive deliveries
-        val timeDifferences = sortedDeliveries.windowed(2, 1) { pair ->
-            val previousStart = pair[0].startedAt
-            val currentStart = pair[1].startedAt
-            Duration.between(previousStart, currentStart).toMinutes().toDouble()
-        }
-
-        // Calculate average time difference
-        val averageMinutesBetweenDeliveryStart = timeDifferences.average()
+        val averageMinutesBetweenDeliveryStart = calculateAverageMinutesBetweenStarts(deliveries)
         logger.debug {
             "Average time between delivery starts: $averageMinutesBetweenDeliveryStart for deliveries: ${deliveries.map { it.id }}"
         }
@@ -88,6 +60,22 @@ class DeliveryService(
             deliveries = deliveryCount,
             averageMinutesBetweenDeliveryStart = averageMinutesBetweenDeliveryStart
         )
+    }
+
+    private fun yesterdayRange(zoneId: ZoneId = ZoneId.of("Europe/Amsterdam")): Pair<OffsetDateTime, OffsetDateTime> {
+        val now = ZonedDateTime.now(zoneId)
+        val startOfYesterday = now.minusDays(1).toLocalDate().atStartOfDay(zoneId).toOffsetDateTime()
+        val endOfYesterday = startOfYesterday.plusDays(1)
+        return startOfYesterday to endOfYesterday
+    }
+
+    private fun calculateAverageMinutesBetweenStarts(deliveries: List<Delivery>): Double {
+        if (deliveries.size < 2) return 0.0
+        val sortedDeliveries = deliveries.sortedBy { it.startedAt }
+        val timeDifferences = sortedDeliveries.windowed(2, 1) { (previous, current) ->
+            Duration.between(previous.startedAt, current.startedAt).toMinutes().toDouble()
+        }
+        return timeDifferences.average()
     }
 
     private fun validatedDatesAndStatus(

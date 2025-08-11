@@ -217,4 +217,42 @@ class DeliveryServiceTest {
         assertThat(summary.averageMinutesBetweenDeliveryStart).isEqualTo(0.0)
         verify(deliveryRepository).findAllByStartedAtBetween(yesterdayStart, yesterdayEnd)
     }
+
+    @Test
+    fun `test getYesterdayBusinessSummary with multiple deliveries`() {
+        // Arrange
+        val zoneId = ZoneId.of("Europe/Amsterdam")
+        val now = ZonedDateTime.now(zoneId)
+        val yesterdayStart = now.minusDays(1).toLocalDate().atStartOfDay(zoneId).toOffsetDateTime()
+        val yesterdayEnd = yesterdayStart.plusDays(1)
+
+        val delivery1 = Delivery(
+            id = UUID.randomUUID().toString(),
+            vehicleId = "v1",
+            address = "a1",
+            startedAt = yesterdayStart.plusHours(1),
+            status = DeliveryStatus.DELIVERED
+        )
+        val delivery2 = Delivery(
+            id = UUID.randomUUID().toString(),
+            vehicleId = "v2",
+            address = "a2",
+            startedAt = yesterdayStart.plusHours(2),
+            status = DeliveryStatus.DELIVERED
+        )
+
+        `when`(
+            deliveryRepository.findAllByStartedAtBetween(
+                yesterdayStart, yesterdayEnd
+            )
+        ).thenReturn(listOf(delivery1, delivery2))
+
+        // Act
+        val summary = deliveryService.getYesterdayBusinessSummary()
+
+        // Assert
+        assertThat(summary.deliveries).isEqualTo(2)
+        assertThat(summary.averageMinutesBetweenDeliveryStart).isEqualTo(60.0)
+        verify(deliveryRepository).findAllByStartedAtBetween(yesterdayStart, yesterdayEnd)
+    }
 }
